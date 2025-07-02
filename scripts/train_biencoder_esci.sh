@@ -18,14 +18,14 @@ PROC_PER_NODE=$(nvidia-smi --list-gpus | wc -l)
 # python -u -m torch.distributed.launch --nproc_per_node ${PROC_PER_NODE} src/train_biencoder.py \
 deepspeed src/train_biencoder.py --deepspeed ds_config.json \
     --model_name_or_path intfloat/simlm-base-msmarco \
-    --per_device_train_batch_size 416 \
-    --per_device_eval_batch_size 416 \
+    --per_device_train_batch_size ${BS} \
+    --per_device_eval_batch_size ${BS} \
     --add_pooler False \
     --t 0.02 \
     --seed 1234 \
     --do_train \
     --fp16 \
-    --train_file "${DATA_DIR}/train.jsonl" \
+    --train_file "${DATA_DIR}/train_w_negatives.jsonl" \
     --validation_file "${DATA_DIR}/test.jsonl" \
     --q_max_len 32 \
     --p_max_len 144 \
@@ -47,16 +47,16 @@ deepspeed src/train_biencoder.py --deepspeed ds_config.json \
     --disable_tqdm True \
     --data_name esci \
     --do_kd_biencoder False \
-    --full_contrastive_loss False \
+    --full_contrastive_loss ${FULL_LOSS} \
     --positive_size 1 \
-    --additional_positives 0 \
-    --n_hard_neg 0 \
+    --additional_positives ${AD_POS} \
+    --n_hard_neg ${N_HARD} \
     --n_rand_neg 0 \
     --n_other_neg 0 \
-    --fn_kk_threshold 0 \
+    --fn_kk_threshold ${FN} \
     --other_neg_sampling_strategy None \
     --add_qq_regularization False \
     --fill_neg_with_random_ids True \
-    --embedding_dedup_threshold 0 \
+    --embedding_dedup_threshold ${DEDUP} \
     --use_gradient_checkpointing \
     --report_to none "$@"
